@@ -2,7 +2,7 @@ import AFLAdmin from 0x01cf0e2f2f715450
 import FungibleToken from 0xee82856bf20e2aa6
 import FlowToken from 0x0ae53cb6e3f42a79
 
-transaction {
+transaction(templateId:UInt64) {
     let adminRef: &AFLAdmin.Admin
     let temproryVault : @FungibleToken.Vault
 
@@ -18,7 +18,7 @@ transaction {
 
     }
     execute{
-        self.adminRef.buyPack(templateId:4, account:0x179b6b1cb6755e31, price:49.0, flowPayment: <- self.temproryVault)
+        self.adminRef.buyPack(templateId:templateId, account:0x179b6b1cb6755e31, price:49.0, flowPayment: <- self.temproryVault)
     }
 
 }

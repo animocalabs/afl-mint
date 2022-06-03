@@ -29,7 +29,8 @@ pub contract AFLPack {
     }
     pub resource interface PackPublic {
         // making this function public to call by other users
-        pub fun openPack(packNFT: @NonFungibleToken.NFT, receiptAddress: Address)
+        pub fun openPack(templateId:Int,packNFT: @NonFungibleToken.NFT, receiptAddress: Address)
+        
     }
     pub resource Pack : PackPublic {
 
@@ -59,22 +60,45 @@ pub contract AFLPack {
             emit PackCreated(templateId: templateId)
         }
         
-        pub fun openPack(packNFT: @NonFungibleToken.NFT, receiptAddress: Address) {
+        pub fun openPack(templateId:Int, packNFT: @NonFungibleToken.NFT, receiptAddress: Address) {
             pre {
+                templateId != nil :"template id must not be null"
                 packNFT != nil : "pack nft must not be null"
                 receiptAddress != nil : "receipt address must not be null"
             }
             var packNFTData = AFLNFT.getNFTData(nftId: packNFT.id)
             var packTemplateData = AFLNFT.getTemplateById(templateId: packNFTData.templateId)
             let templateImmutableData = packTemplateData.getImmutableData()
-            let allIds = templateImmutableData["nftTemplates"]! as! [AnyStruct]
+            let allIds = templateImmutableData["nftTemplates"]! as! [Int]
             assert(allIds.length <= 3, message: "templates limit exceeded")
-            for tempID in allIds {
-                var castedTempId = UInt64(tempID as! Int)
-                AFLNFT.mintNFT(templateId: castedTempId, account: receiptAddress)
-            }
+            // var castedTempId = Int(templateId as! Int)
+            log(templateId.getType())
+            assert(allIds.contains(templateId), message: "templat does not exist in the array")
+            // for tempID in allIds {
+            var castedTempId = UInt64(templateId as! Int)
+            log(castedTempId.getType())
+            AFLNFT.mintNFT(templateId: castedTempId, account: receiptAddress)
+            log("before removing")
+            log(allIds.length)
+            allIds.removeFirst()
+            // }
+            log("after removing")
+            log(allIds.length)
             emit PackOpened(nftId: packNFT.id, receiptAddress: self.owner?.address)
-            destroy packNFT
+            if(allIds.length>1){
+            log(packNFT.id)
+            let receiptAccount = getAccount(0x179b6b1cb6755e31)
+            let recipientCollection = receiptAccount
+            .getCapability(AFLNFT.CollectionPublicPath)
+            .borrow<&{AFLNFT.AFLNFTCollectionPublic}>()
+            ?? panic("Could not get receiver reference to the NFT Collection")
+            recipientCollection.deposit(token: <-packNFT)
+            }
+            else {
+                log("reached")
+                destroy packNFT
+            }
+            // destroy packNFT
         }
         init(){
         }
