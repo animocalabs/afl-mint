@@ -24,8 +24,6 @@ pub contract AFLNFT : NonFungibleToken {
     // A dictionary that stores all NFTs against it's nft-id.
     access(self) var allNFTs: {UInt64: NFTData}
 
-    // access(contract) let adminRef : Capability<&FlowToken.Vault{FungibleToken.Receiver}>
-
     // A structure that contain all the data and methods related to Template
     pub struct Template {
         pub let templateId: UInt64
@@ -157,15 +155,10 @@ pub contract AFLNFT : NonFungibleToken {
     //method to mint NFT, only access by the verified user
     access(account) fun mintNFT(templateId: UInt64, account: Address) {
         pre {
-            // price > 0.0: "Price should be greater than zero"
             account != nil: "invalid receipt Address"
-            // flowPayment.balance == price: "Your vault does not have balance to buy NFT"
             AFLNFT.allTemplates[templateId] != nil: "Template Id must be valid"
         }
 
-        // let vaultRef = self.adminRef!.borrow()
-        //         ?? panic("Could not borrow reference to owner token vault")
-        // vaultRef.deposit(from: <-flowPayment)
         let receiptAccount = getAccount(account)
         let recipientCollection = receiptAccount
             .getCapability(AFLNFT.CollectionPublicPath)
@@ -201,8 +194,6 @@ pub contract AFLNFT : NonFungibleToken {
     }
     
     init(){
-        // var adminRefCap =  self.account.getCapability<&FlowToken.Vault{FungibleToken.Receiver}>(/public/flowTokenReceiver)
-        // self.adminRef = adminRefCap
         self.lastIssuedTemplateId = 1
         self.totalSupply = 0
         self.allTemplates = {}

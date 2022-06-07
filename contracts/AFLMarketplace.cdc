@@ -118,7 +118,7 @@ pub contract AFLMarketplace {
 
             // Remove and return the token.
             // Will revert if the token doesn't exist
-            let token <- self.forSale.withdraw(withdrawID: tokenID) as! @AFL.NFT
+            let token <- self.forSale.withdraw(withdrawID: tokenID) as! @AFLNFT.NFT
 
             // Remove the price from the prices dictionary
             self.prices.remove(key: tokenID)

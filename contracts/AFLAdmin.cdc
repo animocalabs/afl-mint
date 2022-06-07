@@ -14,11 +14,7 @@ pub contract AFLAdmin {
         pub fun createTemplate(maxSupply:UInt64, immutableData:{String: AnyStruct}){
             AFLNFT.createTemplate(maxSupply:maxSupply, immutableData:immutableData)
         }
-        
-        pub fun buyPack(templateId: UInt64, account: Address, price: UFix64, flowPayment: @FungibleToken.Vault){
-            AFLPack.buyPack(templateId:templateId, receiptAddress:account, price:price, flowPayment: <-flowPayment)
-        }
-        
+
         pub fun openPack(templateId: UInt64, account: Address){
             AFLNFT.mintNFT(templateId:templateId, account:account)
         }

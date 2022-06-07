@@ -9,6 +9,5 @@ transaction(templateId: UInt64, account:Address){
             ??panic("could not borrow reference")
 
         adminRef.openPack( templateId: templateId, account: account)
-        log("Template created")
     }
 }

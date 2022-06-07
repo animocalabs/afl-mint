@@ -23,6 +23,5 @@ transaction(maxSupply:UInt64) {
             "tier"              : "Common"
         }
         adminRef.createTemplate( maxSupply: maxSupply, immutableData: immutableData)
-        log("Template created")
     }
 }
