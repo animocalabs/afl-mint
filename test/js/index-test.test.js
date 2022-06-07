@@ -1,5 +1,17 @@
 import path from "path"
-import { init, emulator, getAccountAddress, deployContractByName, getContractAddress, getTransactionCode, getScriptCode, executeScript, sendTransaction } from "flow-js-testing";
+import {
+  init,
+  emulator,
+  getAccountAddress,
+  deployContractByName,
+  getContractAddress,
+  getTransactionCode,
+  getScriptCode,
+  executeScript,
+  mintFlow,
+  getFlowBalance,
+  sendTransaction
+} from "flow-js-testing";
 
 jest.setTimeout(100000);
 
@@ -24,6 +36,12 @@ describe("Replicate Playground Accounts", () => {
     const Bob = await getAccountAddress("Bob");
     const Charlie = await getAccountAddress("Charlie");
     const Dave = await getAccountAddress("Dave");
+    const data = await mintFlow(Bob, "1000.0");
+    const data1 = await mintFlow(Charlie, "1000.0")
+    const updatedBalance = await getFlowBalance(Bob);
+    const updatedBalance1 = await getFlowBalance(Charlie)
+    console.log(updatedBalance);
+    console.log(updatedBalance1);
 
     console.log(
       "Four Playground accounts were created with following addresses"
@@ -55,7 +73,7 @@ describe("Deployment", () => {
   });
   test("Deploy for AFLNFT", async () => {
     const name = "AFLNFT"
-    const to = await getAccountAddress("Bob")
+    const to = await getAccountAddress("Alice")
     let update = true
 
     let result;
@@ -71,10 +89,9 @@ describe("Deployment", () => {
     expect(name).toBe("AFLNFT");
 
   });
-
   test("Deploy for AFLPack", async () => {
     const name = "AFLPack"
-    const to = await getAccountAddress("Bob")
+    const to = await getAccountAddress("Alice")
     let update = true
 
     const NonFungibleToken = await getContractAddress("NonFungibleToken");
@@ -96,10 +113,9 @@ describe("Deployment", () => {
     expect(name).toBe("AFLPack");
 
   });
-
   test("Deploy for AFLAdmin", async () => {
     const name = "AFLAdmin";
-    const to = await getAccountAddress("Bob");
+    const to = await getAccountAddress("Alice");
     let update = true;
     const NonFungibleToken = await getContractAddress("NonFungibleToken");
     const AFLNFT = await getContractAddress("AFLNFT")
@@ -134,10 +150,10 @@ describe("Transactions", () => {
     const name = "createNFTTemplate";
 
     // Import participating accounts
-    const Bob = await getAccountAddress("Bob");
+    const Alice = await getAccountAddress("Alice");
 
     // Set transaction signers
-    const signers = [Bob];
+    const signers = [Alice];
 
     // Generate addressMap from import statements
     const NonFungibleToken = await getContractAddress("NonFungibleToken");
@@ -154,7 +170,7 @@ describe("Transactions", () => {
       addressMap,
     });
     //  brandId, schemaId, maxSupply
-    const args = [1, 1, 14];
+    const args = [1];
 
     let txResult;
     try {
@@ -171,13 +187,13 @@ describe("Transactions", () => {
     expect(txResult[0].status).toBe(4);
   });
   test("test transaction create pack template", async () => {
-    const name = "creaetPackTemplate";
+    const name = "createPackTemplate";
 
     // Import participating accounts
-    const Bob = await getAccountAddress("Bob");
+    const Alice = await getAccountAddress("Alice");
 
     // Set transaction signers
-    const signers = [Bob];
+    const signers = [Alice];
 
     // Generate addressMap from import statements
     const NonFungibleToken = await getContractAddress("NonFungibleToken");
@@ -194,7 +210,7 @@ describe("Transactions", () => {
       addressMap,
     });
     // brandId, SchemaId, max supply
-    const args = [1, 2, 100];
+    const args = [1];
 
     let txResult;
     try {
@@ -214,10 +230,10 @@ describe("Transactions", () => {
     const name = "createPack";
 
     // Import participating accounts
-    const Bob = await getAccountAddress("Bob");
+    const Alice = await getAccountAddress("Alice");
 
     // Set transaction signers
-    const signers = [Bob];
+    const signers = [Alice];
 
     // Generate addressMap from import statements
     const NonFungibleToken = await getContractAddress("NonFungibleToken");
@@ -237,7 +253,7 @@ describe("Transactions", () => {
     var currentTimeInSeconds = Math.floor(Date.now() / 1000) + 0.0; //unix timestamp in seconds
 
     //templateId: 2, openDate: 1640351132.0
-    const args = [2, currentTimeInSeconds];
+    const args = [2];
 
     let txResult;
     try {
@@ -253,7 +269,44 @@ describe("Transactions", () => {
 
     expect(txResult[0].errorMessage).toBe("");
   });
-  test("test transaction setup account for user", async () => {
+  test("test transaction setup account for Bob", async () => {
+    const name = "setupAccount";
+
+    // Import participating accounts
+    const Bob = await getAccountAddress("Bob");
+
+    // Set transaction signers
+    const signers = [Bob];
+
+    // Generate addressMap from import statements
+    const NonFungibleToken = await getContractAddress("NonFungibleToken");
+    const AFLNFT = await getContractAddress("AFLNFT");
+    const addressMap = {
+      NonFungibleToken,
+      AFLNFT,
+    };
+
+    let code = await getTransactionCode({
+      name,
+      addressMap,
+    });
+
+
+    let txResult;
+    try {
+      txResult = await sendTransaction({
+        code,
+        signers,
+        // args,
+      });
+    } catch (e) {
+      console.log(e);
+    }
+    console.log("tx Result", txResult);
+
+    expect(txResult[0].errorMessage).toBe("");
+  });
+  test("test transaction setup account for Charlie", async () => {
     const name = "setupAccount";
 
     // Import participating accounts
@@ -290,18 +343,174 @@ describe("Transactions", () => {
 
     expect(txResult[0].errorMessage).toBe("");
   });
+  test("test transaction add Owner", async () => {
+    const name = "addNewOwner";
+
+    // Import participating accounts
+    const Charlie = await getAccountAddress("Charlie");
+    const Alice = await getAccountAddress("Alice");
+    // Set transaction signers
+    const signers = [Alice];
+
+    // Generate addressMap from import statements
+    const NonFungibleToken = await getContractAddress("NonFungibleToken");
+    const AFLNFT = await getContractAddress("AFLNFT");
+    const AFLPack = await getContractAddress("AFLPack")
+    const addressMap = {
+      NonFungibleToken,
+      AFLNFT,
+      AFLPack,
+    };
+    let code = await getTransactionCode({
+      name,
+      addressMap,
+    });
+
+    var currentTimeInSeconds = Math.floor(Date.now() / 1000) + 0.0; //unix timestamp in seconds
+    code = code.toString().replace(/(?:getAccount\(\s*)(0x.*)(?:\s*\))/g, (_, match) => {
+      const accounts = {
+        "0x01": Alice,
+        "0x03": Charlie
+      };
+      const name = accounts[match];
+      return `getAccount(${name})`;
+    });
+
+    const args = [Charlie];
+
+    let txResult;
+    try {
+      txResult = await sendTransaction({
+        code,
+        signers,
+        args,
+      });
+    } catch (e) {
+      console.log(e);
+    }
+    console.log("tx Result", txResult);
+
+    expect(txResult[0].errorMessage).toBe("");
+  });
 
 
+  test("test transaction buy Pack", async () => {
+    const name = "buyPackmint";
+
+    // Import participating accounts
+    const Bob = await getAccountAddress("Bob");
+    const Alice = await getAccountAddress("Alice");
+    // Set transaction signers
+    const signers = [Bob];
+
+    // Generate addressMap from import statements
+    const NonFungibleToken = await getContractAddress("NonFungibleToken");
+    const AFLNFT = await getContractAddress("AFLNFT");
+    const AFLPack = await getContractAddress("AFLPack")
+    const FungibleToken = "0xee82856bf20e2aa6"
+    const FlowToken = "0x0ae53cb6e3f42a79"
+    const addressMap = {
+      NonFungibleToken,
+      AFLNFT,
+      AFLPack,
+      FungibleToken,
+      FlowToken
+    };
+    let code = await getTransactionCode({
+      name,
+      addressMap,
+    });
+
+    var currentTimeInSeconds = Math.floor(Date.now() / 1000) + 0.0; //unix timestamp in seconds
+    code = code.toString().replace(/(?:getAccount\(\s*)(0x.*)(?:\s*\))/g, (_, match) => {
+      const accounts = {
+        "0x01": Alice,
+        "0x02": Bob
+      };
+      const name = accounts[match];
+      return `getAccount(${name})`;
+    });
+
+    const args = [Alice];
+
+    let txResult;
+    try {
+      txResult = await sendTransaction({
+        code,
+        signers,
+        args,
+      });
+    } catch (e) {
+      console.log(e);
+    }
+    console.log("tx Result", txResult);
+
+    expect(txResult[0].errorMessage).toBe("");
+  });
+  test("test transaction buy Pack", async () => {
+    const name = "openPack";
+
+    // Import participating accounts
+    const Bob = await getAccountAddress("Bob");
+    const Alice = await getAccountAddress("Alice");
+    // Set transaction signers
+    const signers = [Bob];
+
+    // Generate addressMap from import statements
+    const NonFungibleToken = await getContractAddress("NonFungibleToken");
+    const AFLNFT = await getContractAddress("AFLNFT");
+    const AFLPack = await getContractAddress("AFLPack")
+    const addressMap = {
+      NonFungibleToken,
+      AFLNFT,
+      AFLPack,
+    };
+    let code = await getTransactionCode({
+      name,
+      addressMap,
+    });
+
+    var currentTimeInSeconds = Math.floor(Date.now() / 1000) + 0.0; //unix timestamp in seconds
+    code = code.toString().replace(/(?:getAccount\(\s*)(0x.*)(?:\s*\))/g, (_, match) => {
+      const accounts = {
+        "0x01": Alice,
+        "0x02": Bob
+      };
+      const name = accounts[match];
+      return `getAccount(${name})`;
+    });
+
+    const args = [Alice];
+
+    let txResult;
+    try {
+      txResult = await sendTransaction({
+        code,
+        signers,
+        args,
+      });
+    } catch (e) {
+      console.log(e);
+    }
+    console.log("tx Result", txResult);
+
+    expect(txResult[0].errorMessage).toBe("");
+  });
 })
 describe("Scripts", () => {
-  test("get AFLNFT data", async () => {
+  test("get AFLNFT Ids", async () => {
 
-    const name = "getAFLNFTData";
+    const name = "getAllNFTIds";
     const Bob = await getAccountAddress("Bob");
+    const Alice = await getAccountAddress("Alice");
+    const Charlie = await getAccountAddress("Charlie");
+
 
     const NonFungibleToken = await getContractAddress("NonFungibleToken");
     const AFLNFT = await getContractAddress("AFLNFT");
     const AFLPack = await getContractAddress("AFLPack")
+
+
 
     const addressMap = {
       NonFungibleToken,
@@ -321,14 +530,14 @@ describe("Scripts", () => {
       const name = accounts[match];
       return `getAccount(${name})`;
     });
+    const args = [Bob]
 
     const result = await executeScript({
       code,
+      args,
     });
     console.log("result", result);
-
-
-
+    console.log(await getFlowBalance(Charlie));
   });
 
 })

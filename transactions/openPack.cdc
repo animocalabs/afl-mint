@@ -1,9 +1,9 @@
 
 import AFLNFT from 0x01cf0e2f2f715450
 import AFLPack from 0x01cf0e2f2f715450
-transaction(){
+transaction(accountAddress:Address){
     prepare(acct: AuthAccount) {
-        let account = getAccount(0x01cf0e2f2f715450)
+        let account = getAccount(accountAddress)
         let adminRef = account
                 .getCapability<&{AFLPack.PackPublic}>(AFLPack.PackPublicPath)
                 .borrow()
