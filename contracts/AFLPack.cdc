@@ -32,9 +32,6 @@ pub contract AFLPack {
     pub resource interface PackPublic {
         // making this function public to call by authorized users
         pub fun openPack(packNFT: @NonFungibleToken.NFT, receiptAddress: Address)
-        // making this function public to call by authorized users
-        pub fun buyPack(templateId: UInt64, receiptAddress: Address, price: UFix64, flowPayment: @FungibleToken.Vault)
-
     }
     pub resource Pack : PackPublic {
 

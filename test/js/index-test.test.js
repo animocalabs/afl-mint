@@ -36,12 +36,8 @@ describe("Replicate Playground Accounts", () => {
     const Bob = await getAccountAddress("Bob");
     const Charlie = await getAccountAddress("Charlie");
     const Dave = await getAccountAddress("Dave");
-    const data = await mintFlow(Bob, "1000.0");
-    const data1 = await mintFlow(Charlie, "1000.0")
-    const updatedBalance = await getFlowBalance(Bob);
-    const updatedBalance1 = await getFlowBalance(Charlie)
-    console.log(updatedBalance);
-    console.log(updatedBalance1);
+    await mintFlow(Bob, "1000.0");
+    await mintFlow(Charlie, "1000.0")
 
     console.log(
       "Four Playground accounts were created with following addresses"
@@ -250,9 +246,7 @@ describe("Transactions", () => {
       addressMap,
     });
 
-    var currentTimeInSeconds = Math.floor(Date.now() / 1000) + 0.0; //unix timestamp in seconds
 
-    //templateId: 2, openDate: 1640351132.0
     const args = [2];
 
     let txResult;
@@ -366,7 +360,6 @@ describe("Transactions", () => {
       addressMap,
     });
 
-    var currentTimeInSeconds = Math.floor(Date.now() / 1000) + 0.0; //unix timestamp in seconds
     code = code.toString().replace(/(?:getAccount\(\s*)(0x.*)(?:\s*\))/g, (_, match) => {
       const accounts = {
         "0x01": Alice,
@@ -393,7 +386,6 @@ describe("Transactions", () => {
     expect(txResult[0].errorMessage).toBe("");
   });
 
-
   test("test transaction buy Pack", async () => {
     const name = "buyPackmint";
 
@@ -401,7 +393,7 @@ describe("Transactions", () => {
     const Bob = await getAccountAddress("Bob");
     const Alice = await getAccountAddress("Alice");
     // Set transaction signers
-    const signers = [Bob];
+    const signers = [Alice, Bob];
 
     // Generate addressMap from import statements
     const NonFungibleToken = await getContractAddress("NonFungibleToken");
@@ -421,7 +413,6 @@ describe("Transactions", () => {
       addressMap,
     });
 
-    var currentTimeInSeconds = Math.floor(Date.now() / 1000) + 0.0; //unix timestamp in seconds
     code = code.toString().replace(/(?:getAccount\(\s*)(0x.*)(?:\s*\))/g, (_, match) => {
       const accounts = {
         "0x01": Alice,
@@ -431,14 +422,14 @@ describe("Transactions", () => {
       return `getAccount(${name})`;
     });
 
-    const args = [Alice];
+    // const args = [Alice];
 
     let txResult;
     try {
       txResult = await sendTransaction({
         code,
         signers,
-        args,
+        // args,
       });
     } catch (e) {
       console.log(e);
@@ -447,7 +438,7 @@ describe("Transactions", () => {
 
     expect(txResult[0].errorMessage).toBe("");
   });
-  test("test transaction buy Pack", async () => {
+  test("test transaction open Pack", async () => {
     const name = "openPack";
 
     // Import participating accounts
@@ -470,7 +461,6 @@ describe("Transactions", () => {
       addressMap,
     });
 
-    var currentTimeInSeconds = Math.floor(Date.now() / 1000) + 0.0; //unix timestamp in seconds
     code = code.toString().replace(/(?:getAccount\(\s*)(0x.*)(?:\s*\))/g, (_, match) => {
       const accounts = {
         "0x01": Alice,
@@ -538,6 +528,40 @@ describe("Scripts", () => {
     });
     console.log("result", result);
     console.log(await getFlowBalance(Charlie));
+  });
+  test("get NFT template data", async () => {
+
+    const name = "getNFTTemplateData";
+    const Bob = await getAccountAddress("Bob");
+
+
+    const NonFungibleToken = await getContractAddress("NonFungibleToken");
+    const AFLNFT = await getContractAddress("AFLNFT");
+
+
+    const addressMap = {
+      NonFungibleToken,
+      AFLNFT,
+    }
+    let code = await getScriptCode({
+      name,
+      addressMap,
+    })
+
+    code = code.toString().replace(/(?:getAccount\(\s*)(0x.*)(?:\s*\))/g, (_, match) => {
+      const accounts = {
+        "0x01": Alice,
+      };
+      const name = accounts[match];
+      return `getAccount(${name})`;
+    });
+    const args = [Bob]
+
+    const result = await executeScript({
+      code,
+      args,
+    });
+    console.log("result", result);
   });
 
 })
