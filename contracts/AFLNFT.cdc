@@ -35,6 +35,7 @@ pub contract AFLNFT : NonFungibleToken {
             pre {
                 maxSupply > 0 : "MaxSupply must be greater than zero"
                 immutableData != nil: "ImmutableData must not be nil"
+                immutableData.length != 0: "New template data cannot be empty"
             }
             
             self.templateId = AFLNFT.lastIssuedTemplateId

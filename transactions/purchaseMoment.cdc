@@ -13,36 +13,42 @@ import AFLMarketplace from 0x01cf0e2f2f715450
 transaction(sellerAddress: Address, tokenID: UInt64, purchaseAmount: UFix64) {
 
     // Local variables for the AFLNFT collection object and token provider
-    let collectionRef: &AFLNFT.Collection
-    let providerRef: &FlowToken.Vault{FungibleToken.Provider}
+    let collectionCap: Capability<&{AFLNFT.AFLNFTCollectionPublic}>
+    let vaultCap: Capability<&FlowToken.Vault{FungibleToken.Receiver}>
+
+    let temporaryVault: @FungibleToken.Vault
     
     prepare(acct: AuthAccount) {
 
-        // borrow a reference to the signer's collection
-        self.collectionRef = acct.borrow<&AFLNFT.Collection>(from: /storage/AFLNFTCollection)
-            ?? panic("Could not borrow reference to the AFLNFT Collection")
+         // get the references to the buyer''s Vault and NFT Collection receiver
+        var collectionCap = acct.getCapability<&{AFLNFT.AFLNFTCollectionPublic}>(AFLNFT.CollectionPublicPath)
 
-        // borrow a reference to the signer's fungible token Vault
-        self.providerRef = acct.borrow<&FlowToken.Vault{FungibleToken.Provider}>(from: /storage/flowTokenProviders)!   
+        // if collection is not created yet we make it.
+        if !collectionCap.check() {
+            // store an empty NFT Collection in account storage
+            acct.save<@AFLNFT.Collection>(<- AFLNFT.createEmptyCollection(), to: AFLNFT.CollectionStoragePath)
+            // publish a capability to the Collection in storage
+            acct.link<&{AFLNFT.AFLNFTCollectionPublic}>(AFLNFT.CollectionPublicPath, target: AFLNFT.CollectionStoragePath)
+        }
+
+        self.collectionCap = collectionCap
+        self.vaultCap = acct.getCapability<&FlowToken.Vault{FungibleToken.Receiver}>(/public/flowTokenReceiver)
+
+        let vaultRef = acct.borrow<&FlowToken.Vault{FungibleToken.Provider}>(from: /storage/flowTokenVault) ?? panic("Could not borrow owner''s Vault reference")
+
+        // withdraw tokens from the buyer''s Vault
+        self.temporaryVault <- vaultRef.withdraw(amount: purchaseAmount)
     }
 
     execute {
 
-        // withdraw tokens from the signer's vault
-        let tokens <- self.providerRef.withdraw(amount: purchaseAmount) as! @FlowToken.Vault
-
-        // get the seller's public account object
         let seller = getAccount(sellerAddress)
 
         // borrow a public reference to the seller's sale collection
-        let AFLMarketplaceSaleCollection = seller.getCapability(/public/AFLSaleCollection)
+        let marketplace = seller.getCapability(/public/AFLSaleCollection)
             .borrow<&{AFLMarketplace.SalePublic}>()
             ?? panic("Could not borrow public sale reference")
-    
-        // purchase the AFL moment
-        let purchasedToken <- AFLMarketplaceSaleCollection.purchase(tokenID: tokenID, buyTokens: <-tokens)
-
-        // deposit the purchased AFL moment into the signer's collection
-        self.collectionRef.deposit(token: <-purchasedToken)
+        
+        marketplace.purchase(tokenID:tokenID, recipientCap:self.collectionCap, buyTokens: <- self.temporaryVault)
     }
 }
