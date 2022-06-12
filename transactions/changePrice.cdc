@@ -1,4 +1,4 @@
-import AFLMarketplace from 0x01cf0e2f2f715450
+import AFLMarketplace from 0x4ea480b0fc738e55
 
 transaction(tokenID: UInt64, newPrice:UFix64){
 

@@ -1,23 +1,24 @@
-import AFLMarketplace from 0x01cf0e2f2f715450
+import FungibleToken from 0x9a0766d93b6608b7
+import FlowToken from 0x7e60df042a9c0868
+import AFLMarketplace from 0x4ea480b0fc738e55
+import AFLNFT from 0x4ea480b0fc738e55
 
-// This transaction creates a public sale collection capability that any user can interact with
-// Parameters:
-//
-// tokenReceiverPath: token capability for the account who will receive tokens for purchase
-// beneficiaryAccount: the Flow address of the account where a cut of the purchase will be sent
-// cutPercentage: how much in percentage the beneficiary will receive from the sale
-transaction(tokenReceiverPath: PublicPath, beneficiaryAccount: Address, cutPercentage: UFix64) {
+transaction() {
 
     prepare(acct: AuthAccount) {
-        
-        let ownerCapability = acct.getCapability(tokenReceiverPath)
 
-        let beneficiaryCapability = getAccount(beneficiaryAccount).getCapability(tokenReceiverPath)
+        let marketplaceCap = acct.getCapability<&{AFLMarketplace.SalePublic}>(/public/AFLSaleCollection)
+        if !marketplaceCap.check(){
+            let wallet =  acct.getCapability<&FlowToken.Vault{FungibleToken.Receiver}>(/public/flowTokenReceiver)
+            let sale <- AFLMarketplace.createSaleCollection(ownerVault: wallet)
 
-        let collection <- AFLMarketplace.createSaleCollection(ownerCapability: ownerCapability, beneficiaryCapability: beneficiaryCapability, cutPercentage: cutPercentage)
-        
-        acct.save(<-collection, to: /storage/AFLSaleCollection)
-        
-        acct.link<&AFLMarketplace.SaleCollection{AFLMarketplace.SalePublic}>(/public/AFLSaleCollection, target: /storage/AFLSaleCollection)
+            acct.save<@AFLMarketplace.SaleCollection>(<-sale , to: /storage/AFLSaleCollection)
+
+            acct.link<&{AFLMarketplace.SalePublic}>(/public/AFLSaleCollection, target: /storage/AFLSaleCollection)
+        }
+    
+    }
+
+    execute {
     }
 }

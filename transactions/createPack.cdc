@@ -1,5 +1,5 @@
 
-import AFLPack from 0x01cf0e2f2f715450
+import AFLPack from 0x4ea480b0fc738e55
 
 
 transaction(templateId:UInt64){
@@ -9,9 +9,7 @@ transaction(templateId:UInt64){
         ??panic("could not borrow admin reference")
     }
     execute{
-        // template id 2
         self.adminRef.createPack(templateId: templateId)
-        log("pack created")
 
     }
 

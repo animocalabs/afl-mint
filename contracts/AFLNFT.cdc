@@ -1,6 +1,6 @@
-import NonFungibleToken from 0x01cf0e2f2f715450
-import FungibleToken from 0xee82856bf20e2aa6
-import FlowToken from 0x0ae53cb6e3f42a79
+import FungibleToken from 0x9a0766d93b6608b7
+import NonFungibleToken from 0x631e88ae7f1d7c20
+import FlowToken from 0x7e60df042a9c0868
 pub contract AFLNFT : NonFungibleToken {
     // Events
     pub event ContractInitialized()
@@ -124,7 +124,6 @@ pub contract AFLNFT : NonFungibleToken {
         }
 
         pub fun borrowNFT(id: UInt64): &NonFungibleToken.NFT {
-
             return (&self.ownedNFTs[id] as &NonFungibleToken.NFT?)!
         }
         
@@ -189,7 +188,7 @@ pub contract AFLNFT : NonFungibleToken {
     //method to get nft-data by id
     pub fun getNFTData(nftId: UInt64): NFTData {
         pre {
-            AFLNFT.allNFTs[nftId] != nil:"nft id does not exist"
+            AFLNFT.allNFTs[nftId] != nil: "nft id does not exist"
         }
         return AFLNFT.allNFTs[nftId]!
     }

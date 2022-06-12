@@ -1,5 +1,5 @@
 
-import AFLNFT from 0x01cf0e2f2f715450
+import AFLNFT from 0x4ea480b0fc738e55
 transaction {
     prepare(acct: AuthAccount) {
 
