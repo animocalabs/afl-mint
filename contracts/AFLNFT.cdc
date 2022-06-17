@@ -54,6 +54,7 @@ pub contract AFLNFT : NonFungibleToken {
             self.issuedSupply = self.issuedSupply + 1
             return self.issuedSupply
         }
+
     }
     // A structure that link template and mint-no of NFT
     pub struct NFTData {
@@ -69,13 +70,13 @@ pub contract AFLNFT : NonFungibleToken {
     // 
     pub resource NFT: NonFungibleToken.INFT {
         pub let id: UInt64
-        access(contract) let data: NFTData
 
         init(templateId: UInt64, mintNumber: UInt64) {
             AFLNFT.totalSupply = AFLNFT.totalSupply + 1
+
             self.id = AFLNFT.totalSupply
             AFLNFT.allNFTs[self.id] = NFTData(templateId: templateId, mintNumber: mintNumber)
-            self.data = AFLNFT.allNFTs[self.id]!
+
             emit NFTMinted(nftId: self.id, templateId: templateId, mintNumber: mintNumber)
         }
         destroy(){
@@ -103,7 +104,7 @@ pub contract AFLNFT : NonFungibleToken {
         pub var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
 
         pub fun withdraw(withdrawID: UInt64): @NonFungibleToken.NFT {
-            let token <- self.ownedNFTs.remove(key: withdrawID) 
+            let token  <- self.ownedNFTs.remove(key: withdrawID) 
                 ?? panic("Cannot withdraw: template does not exist in the collection")
             emit Withdraw(id: token.id, from: self.owner?.address)
             return <-token
@@ -158,7 +159,6 @@ pub contract AFLNFT : NonFungibleToken {
             account != nil: "invalid receipt Address"
             AFLNFT.allTemplates[templateId] != nil: "Template Id must be valid"
         }
-
         let receiptAccount = getAccount(account)
         let recipientCollection = receiptAccount
             .getCapability(AFLNFT.CollectionPublicPath)
@@ -169,7 +169,7 @@ pub contract AFLNFT : NonFungibleToken {
     }
 
     //method to create empty Collection
-    pub fun createEmptyCollection(): @Collection {
+    pub fun createEmptyCollection(): @NonFungibleToken.Collection {
         return <- create AFLNFT.Collection()
     }
     

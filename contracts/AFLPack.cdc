@@ -30,7 +30,7 @@ pub contract AFLPack {
     }
     pub resource interface PackPublic {
         // making this function public to call by authorized users
-        pub fun openPack(packNFT: @NonFungibleToken.NFT, receiptAddress: Address)
+        pub fun openPack(packNFT: @AFLNFT.NFT, receiptAddress: Address)
     }
     pub resource Pack : PackPublic {
 
@@ -40,11 +40,12 @@ pub contract AFLPack {
             }
             AFLPack.ownerAddress = owner
         }
+        
 
         pub fun createPack(templateId:UInt64){
             pre {
-                templateId != nil: "template id must not be null"
-                AFLPack.allPacks[templateId] == nil: "Pacl already created with the given template id"
+                templateId != 0: "template id must not be zero"
+                AFLPack.allPacks[templateId] == nil: "Pack already created with the given template id"
             }    
             let templateData = AFLNFT.getTemplateById(templateId: templateId)
             assert(templateData != nil, message: "data for given template id does not exist")
@@ -52,11 +53,21 @@ pub contract AFLPack {
             var allNftTemplateExists = true;
             let templateImmutableData = templateData.getImmutableData()
             let allIds = templateImmutableData["nftTemplates"]! as! [AnyStruct]
-            assert(allIds.length <= 3, message: "templates limit exceeded")
+            assert(allIds.length <= 10, message: "templates limit exceeded")
+            // a temproary variable that will check the array repetation
+            var temTemplateId : UInt64 = 0
             for tempID in allIds {
+                
+                if(UInt64(tempID as! Int)!=temTemplateId){
+                temTemplateId = UInt64(tempID as! Int)
+
                 var castedTempId = UInt64(tempID as! Int)
                 let nftTemplateData = AFLNFT.getTemplateById(templateId: castedTempId)
                 if(nftTemplateData == nil) {
+                    allNftTemplateExists = false
+                    break
+                }
+                }else{
                     allNftTemplateExists = false
                     break
                 }
@@ -69,24 +80,24 @@ pub contract AFLPack {
         pub fun buyPack(templateId: UInt64, receiptAddress: Address, price: UFix64, flowPayment: @FungibleToken.Vault) {
             pre {
                 price > 0.0: "Price should be greater than zero"
-                templateId != nil : "te,mplate id  must not be null"
+                templateId != 0 : "template id  must not be zero"
                 flowPayment.balance == price: "Your vault does not have balance to buy NFT"
                 receiptAddress != nil : "receipt address must not be null"
             }
+            var templateData = AFLNFT.getTemplateById(templateId:templateId)
+            assert(AFLPack.allPacks[templateData.templateId] != nil, message: "Pack is not registered") 
             let receiptAccount = getAccount(AFLPack.ownerAddress)
             let recipientCollection = receiptAccount
                 .getCapability(/public/flowTokenReceiver)
                 .borrow<&FlowToken.Vault{FungibleToken.Receiver}>()
                 ?? panic("Could not get receiver reference to the flow receiver")
-            // let vaultRef = self.adminRef!.borrow()
-            //     ?? panic("Could not borrow reference to owner token vault")
             recipientCollection.deposit(from: <-flowPayment)
-            var templateData = AFLNFT.getTemplateById(templateId:templateId)
+
             AFLNFT.mintNFT(templateId: templateId, account: receiptAddress)
             emit PackBought(templateId: templateId, receiptAddress: receiptAddress)
             
         } 
-        pub fun openPack(packNFT: @NonFungibleToken.NFT, receiptAddress: Address) {
+        pub fun openPack(packNFT: @AFLNFT.NFT, receiptAddress: Address) {
             pre {
                 packNFT != nil : "pack nft must not be null"
                 receiptAddress != nil : "receipt address must not be null"
@@ -94,6 +105,7 @@ pub contract AFLPack {
             var packNFTData = AFLNFT.getNFTData(nftId: packNFT.id)
             var packTemplateData = AFLNFT.getTemplateById(templateId: packNFTData.templateId)
             let templateImmutableData = packTemplateData.getImmutableData()
+            assert(AFLPack.allPacks[packNFTData.templateId] != nil, message: "Pack is not registered") 
             let allIds = templateImmutableData["nftTemplates"]! as! [AnyStruct]
             assert(allIds.length <= 10, message: "templates limit exceeded")
             for tempID in allIds {

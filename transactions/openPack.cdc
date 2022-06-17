@@ -12,7 +12,7 @@ transaction(accountAddress:Address, nftId:UInt64, receiptAddress:Address){
         let collectionRef =  acct.borrow<&AFLNFT.Collection>(from: AFLNFT.CollectionStoragePath)
         ??panic("could not borrow a reference to the the stored nft Collection")
 
-        adminRef.openPack(packNFT :<- collectionRef.withdraw(withdrawID: nftId), receiptAddress: receiptAddress) 
+        adminRef.openPack(packNFT :<- (collectionRef.withdraw(withdrawID: 1) as! @AFLNFT.NFT), receiptAddress: 0x179b6b1cb6755e31) 
     }
 
 

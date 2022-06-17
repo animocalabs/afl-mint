@@ -26,7 +26,7 @@ transaction(sellerAddress: Address, tokenID: UInt64, purchaseAmount: UFix64) {
         // if collection is not created yet we make it.
         if !collectionCap.check() {
             // store an empty NFT Collection in account storage
-            acct.save<@AFLNFT.Collection>(<- AFLNFT.createEmptyCollection(), to: AFLNFT.CollectionStoragePath)
+            acct.save(<- AFLNFT.createEmptyCollection(), to: AFLNFT.CollectionStoragePath)
             // publish a capability to the Collection in storage
             acct.link<&{AFLNFT.AFLNFTCollectionPublic}>(AFLNFT.CollectionPublicPath, target: AFLNFT.CollectionStoragePath)
         }
