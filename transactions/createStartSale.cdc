@@ -5,8 +5,7 @@ import FlowToken from 0x0ae53cb6e3f42a79
 
 // This transaction puts a moment owned by the user up for sale
 // Parameters:
-//
-// cutPercentage: how much in percentage the beneficiary will receive from the sale
+
 // momentID: ID of moment to be put on sale
 // price: price of moment
 transaction(momentID: UInt64, price: UFix64) {
