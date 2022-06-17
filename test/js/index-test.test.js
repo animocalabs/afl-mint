@@ -134,8 +134,38 @@ describe("Deployment", () => {
     catch (e) {
       console.log(e)
     }
-
     expect(name).toBe("AFLAdmin");
+  });
+  test("Deploy for AFLMarketplace", async () => {
+    const name = "AFLMarketplace";
+    const to = await getAccountAddress("Alice");
+    let update = true;
+    const NonFungibleToken = await getContractAddress("NonFungibleToken");
+    const AFLNFT = await getContractAddress("AFLNFT")
+    const AFLPack = await getContractAddress("AFLPack")
+    const FungibleToken = "0xee82856bf20e2aa6"
+    const FlowToken = "0x0ae53cb6e3f42a79"
+    const addressMap = {
+      NonFungibleToken,
+      AFLNFT,
+      AFLPack,
+      FungibleToken,
+      FlowToken
+    };
+    let result;
+    try {
+      result = await deployContractByName({
+        name,
+        to,
+        addressMap,
+        update,
+      });
+    }
+    catch (e) {
+      console.log(e)
+    }
+
+    expect(name).toBe("AFLMarketplace");
   });
 
 });
@@ -486,9 +516,209 @@ describe("Transactions", () => {
 
     expect(txResult[0].errorMessage).toBe("");
   });
+
+  // test("test transaction change percentage", async () => {
+  //   const name = "changePercentage";
+
+  //   // Import participating accounts
+  //   const Alice = await getAccountAddress("Alice");
+  //   // Set transaction signers
+  //   const signers = [Alice];
+
+  //   // Generate addressMap from import statements
+  //   const AFLMarketplace = await getAccountAddress("AFLMarketplace")
+  //   const FungibleToken = "0xee82856bf20e2aa6"
+  //   const FlowToken = "0x0ae53cb6e3f42a79"
+
+  //   const addressMap = {
+  //     AFLMarketplace,
+  //     FungibleToken,
+  //     FlowToken
+  //   };
+  //   let code = await getTransactionCode({
+  //     name,
+  //     addressMap,
+  //   });
+
+  //   code = code.toString().replace(/(?:getAccount\(\s*)(0x.*)(?:\s*\))/g, (_, match) => {
+  //     const accounts = {
+  //       "0x01": Alice,
+  //     };
+  //     const name = accounts[match];
+  //     return `getAccount(${name})`;
+  //   });
+
+  //   const args = [0.30];
+
+  //   let txResult;
+  //   try {
+  //     txResult = await sendTransaction({
+  //       code,
+  //       signers,
+  //       args,
+  //     });
+  //   } catch (e) {
+  //     console.log(e);
+  //   }
+  //   console.log("tx Result", txResult);
+
+  //   expect(txResult[0].errorMessage).toBe("");
+  // });
+  test("test transaction create start sale", async () => {
+    const name = "createStartSale";
+
+    // Import participating accounts
+    const Bob = await getAccountAddress("Bob");
+    const Alice = await getAccountAddress("Alice");
+    // Set transaction signers
+    const signers = [Bob];
+
+    // Generate addressMap from import statements
+    const AFLNFT = await getContractAddress("AFLNFT");
+    const AFLMarketplace = await getAccountAddress("AFLMarketplace")
+    const FungibleToken = "0xee82856bf20e2aa6"
+    const FlowToken = "0x0ae53cb6e3f42a79"
+    const addressMap = {
+      AFLNFT,
+      AFLMarketplace,
+      FungibleToken,
+      FlowToken,
+    };
+    let code = await getTransactionCode({
+      name,
+      addressMap,
+    });
+
+    code = code.toString().replace(/(?:getAccount\(\s*)(0x.*)(?:\s*\))/g, (_, match) => {
+      const accounts = {
+        "0x01": Alice,
+        "0x02": Bob
+      };
+      const name = accounts[match];
+      return `getAccount(${name})`;
+    });
+
+    const args = [2, 49.0];
+
+    let txResult;
+    try {
+      txResult = await sendTransaction({
+        code,
+        signers,
+        args,
+      });
+    } catch (e) {
+      console.log(e);
+    }
+    console.log("tx Result", txResult);
+
+    expect(txResult[0].errorMessage).toBe("");
+  });
+  // test("test transaction create stop sale", async () => {
+  //   const name = "stopSale";
+
+  //   // Import participating accounts
+  //   const Bob = await getAccountAddress("Bob");
+  //   const Alice = await getAccountAddress("Alice");
+  //   // Set transaction signers
+  //   const signers = [Bob];
+
+  //   // Generate addressMap from import statements
+  //   const AFLNFT = await getContractAddress("AFLNFT");
+  //   const AFLMarketplace = await getAccountAddress("AFLMarketplace")
+  //   const FungibleToken = "0xee82856bf20e2aa6"
+  //   const FlowToken = "0x0ae53cb6e3f42a79"
+  //   const addressMap = {
+  //     AFLNFT,
+  //     AFLMarketplace,
+  //     FungibleToken,
+  //     FlowToken,
+  //   };
+  //   let code = await getTransactionCode({
+  //     name,
+  //     addressMap,
+  //   });
+
+  //   code = code.toString().replace(/(?:getAccount\(\s*)(0x.*)(?:\s*\))/g, (_, match) => {
+  //     const accounts = {
+  //       "0x01": Alice,
+  //       "0x02": Bob
+  //     };
+  //     const name = accounts[match];
+  //     return `getAccount(${name})`;
+  //   });
+
+  //   const args = [2];
+
+  //   let txResult;
+  //   try {
+  //     txResult = await sendTransaction({
+  //       code,
+  //       signers,
+  //       args,
+  //     });
+  //   } catch (e) {
+  //     console.log(e);
+  //   }
+  //   console.log("tx Result", txResult);
+
+  //   expect(txResult[0].errorMessage).toBe("");
+  // });
+  test("test transaction purchase moment", async () => {
+    const name = "purchaseMoment";
+
+    // Import participating accounts
+    const Bob = await getAccountAddress("Bob");
+    const Alice = await getAccountAddress("Alice");
+    const Charlie = await getAccountAddress("Charlie")
+    // Set transaction signers
+    const signers = [Charlie];
+
+    // Generate addressMap from import statements
+    const AFLNFT = await getContractAddress("AFLNFT");
+    const AFLMarketplace = await getContractAddress("AFLMarketplace")
+    const FungibleToken = "0xee82856bf20e2aa6"
+    const FlowToken = "0x0ae53cb6e3f42a79"
+    const addressMap = {
+      AFLNFT,
+      AFLMarketplace,
+      FungibleToken,
+      FlowToken,
+    };
+    let code = await getTransactionCode({
+      name,
+      addressMap,
+    });
+
+    code = code.toString().replace(/(?:getAccount\(\s*)(0x.*)(?:\s*\))/g, (_, match) => {
+      const accounts = {
+        "0x01": Alice,
+        "0x02": Bob
+      };
+      const name = accounts[match];
+      return `getAccount(${name})`;
+    });
+
+    const args = [Bob, 2, 49.0];
+
+    let txResult;
+    try {
+      txResult = await sendTransaction({
+        code,
+        signers,
+        args,
+      });
+    } catch (e) {
+      console.log(e);
+    }
+    console.log("tx Result", txResult);
+
+    expect(txResult[0].errorMessage).toBe("");
+  });
+
 })
 describe("Scripts", () => {
-  test("get AFLNFT Ids", async () => {
+  test("get AFLNFT Ids for Bob", async () => {
 
     const name = "getAllNFTIds";
     const Bob = await getAccountAddress("Bob");
@@ -527,13 +757,56 @@ describe("Scripts", () => {
       args,
     });
     console.log("result", result);
-    console.log(await getFlowBalance(Charlie));
+    console.log("Charlie Balance", await getFlowBalance(Charlie));
+    console.log("Alice Balance", await getFlowBalance(Alice));
+  });
+  test("get AFLNFT Ids for Charlie", async () => {
+
+    const name = "getAllNFTIds";
+    const Bob = await getAccountAddress("Bob");
+    const Alice = await getAccountAddress("Alice");
+    const Charlie = await getAccountAddress("Charlie");
+
+
+    const NonFungibleToken = await getContractAddress("NonFungibleToken");
+    const AFLNFT = await getContractAddress("AFLNFT");
+    const AFLPack = await getContractAddress("AFLPack")
+
+
+
+    const addressMap = {
+      NonFungibleToken,
+      AFLNFT,
+      AFLPack
+    }
+    let code = await getScriptCode({
+      name,
+      addressMap,
+    })
+
+    code = code.toString().replace(/(?:getAccount\(\s*)(0x.*)(?:\s*\))/g, (_, match) => {
+      const accounts = {
+        "0x01": Alice,
+        "0x02": Bob,
+      };
+      const name = accounts[match];
+      return `getAccount(${name})`;
+    });
+    const args = [Charlie]
+
+    const result = await executeScript({
+      code,
+      args,
+    });
+    console.log("result", result);
+    console.log("Charlie Balance", await getFlowBalance(Charlie));
+    console.log("Alice Balance", await getFlowBalance(Alice));
   });
   test("get NFT template data", async () => {
 
     const name = "getNFTTemplateData";
     const Bob = await getAccountAddress("Bob");
-
+    const Charlie = await getAccountAddress("Charlie")
 
     const NonFungibleToken = await getContractAddress("NonFungibleToken");
     const AFLNFT = await getContractAddress("AFLNFT");
@@ -542,6 +815,37 @@ describe("Scripts", () => {
     const addressMap = {
       NonFungibleToken,
       AFLNFT,
+    }
+    let code = await getScriptCode({
+      name,
+      addressMap,
+    })
+
+    code = code.toString().replace(/(?:getAccount\(\s*)(0x.*)(?:\s*\))/g, (_, match) => {
+      const accounts = {
+        "0x01": Alice,
+      };
+      const name = accounts[match];
+      return `getAccount(${name})`;
+    });
+    const args = [Charlie]
+
+    const result = await executeScript({
+      code,
+      args,
+    });
+    console.log("result", result);
+  });
+  test("get percentage", async () => {
+
+    const name = "getPercentage";
+
+    const AFLMarketplace = await getContractAddress("AFLMarketplace")
+    const Alice = await getAccountAddress("Alice")
+    const Bob = await getAccountAddress("Bob")
+
+    const addressMap = {
+      AFLMarketplace,
     }
     let code = await getScriptCode({
       name,

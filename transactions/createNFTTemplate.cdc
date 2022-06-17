@@ -15,7 +15,7 @@ transaction(maxSupply:UInt64) {
             "round"             : "Round 7",
             "home team"         : "Essendon",
             "away team"         : "Carlton",
-            "stadium location"  : "MCG, Melbourne",
+            "stadium location"  : "MCG, Pakistan",
             "Players Involved"  : "Patrick Cripps",
             "headline"          : "Captain Cripps nails centre-bounce classic",
             "Description"       : "Carlton skipper Patrick Cripps bursts from the clearance and kicks a crucial goal against Essendon",
