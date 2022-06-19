@@ -452,14 +452,14 @@ describe("Transactions", () => {
       return `getAccount(${name})`;
     });
 
-    // const args = [Alice];
+    const args = [2, Bob, 49.0];
 
     let txResult;
     try {
       txResult = await sendTransaction({
         code,
         signers,
-        // args,
+        args,
       });
     } catch (e) {
       console.log(e);
@@ -500,7 +500,7 @@ describe("Transactions", () => {
       return `getAccount(${name})`;
     });
 
-    const args = [Alice];
+    const args = [Alice, 1, Bob];
 
     let txResult;
     try {
