@@ -1,5 +1,5 @@
 
-import AFLNFT from 0x4ea480b0fc738e55
+import AFLNFT from 0xa33d4223b3818e3f
 
 pub fun main(account:Address) : [UInt64]{
     let account1 = getAccount(account)

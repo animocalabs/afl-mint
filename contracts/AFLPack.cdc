@@ -1,7 +1,8 @@
 import FungibleToken from 0x9a0766d93b6608b7
 import NonFungibleToken from 0x631e88ae7f1d7c20
 import FlowToken from 0x7e60df042a9c0868
-import AFLNFT from 0x4ea480b0fc738e55
+import AFLNFT from 0xa33d4223b3818e3f
+import FiatToken from 0xa983fecbed621163
 
 pub contract AFLPack {
      // event when a pack is created
@@ -19,7 +20,7 @@ pub contract AFLPack {
 
     access(self) var ownerAddress: Address
 
-    access(contract) let adminRef : Capability<&FlowToken.Vault{FungibleToken.Receiver}>
+    access(contract) let adminRef : Capability<&FiatToken.Vault{FungibleToken.Receiver}>
 
     pub struct PackData {
         pub let templateId:UInt64
@@ -88,8 +89,8 @@ pub contract AFLPack {
             assert(AFLPack.allPacks[templateData.templateId] != nil, message: "Pack is not registered") 
             let receiptAccount = getAccount(AFLPack.ownerAddress)
             let recipientCollection = receiptAccount
-                .getCapability(/public/flowTokenReceiver)
-                .borrow<&FlowToken.Vault{FungibleToken.Receiver}>()
+                .getCapability(FiatToken.VaultReceiverPubPath)
+                .borrow<&FiatToken.Vault{FungibleToken.Receiver}>()
                 ?? panic("Could not get receiver reference to the flow receiver")
             recipientCollection.deposit(from: <-flowPayment)
 
@@ -135,7 +136,7 @@ pub contract AFLPack {
 
     init() {
         self.ownerAddress = self.account!.address
-        var adminRefCap =  self.account.getCapability<&FlowToken.Vault{FungibleToken.Receiver}>(/public/flowTokenReceiver)
+        var adminRefCap =  self.account.getCapability<&FiatToken.Vault{FungibleToken.Receiver}>(FiatToken.VaultReceiverPubPath)
         self.adminRef = adminRefCap
         self.allPacks = {}
         self.PackStoragePath = /storage/AFLPack

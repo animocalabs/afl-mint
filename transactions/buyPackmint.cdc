@@ -1,7 +1,7 @@
 import FungibleToken from 0x9a0766d93b6608b7
-import FlowToken from 0x7e60df042a9c0868
-import AFLNFT from 0x4ea480b0fc738e55
-import AFLPack from 0x4ea480b0fc738e55
+import AFLNFT from 0xa33d4223b3818e3f
+import AFLPack from 0xa33d4223b3818e3f
+import FiatToken from 0xa983fecbed621163
 
 transaction (templateId:UInt64, receiptAddress:Address, price: UFix64) {
     let adminRef: &AFLPack.Pack
@@ -12,7 +12,7 @@ transaction (templateId:UInt64, receiptAddress:Address, price: UFix64) {
         self.adminRef = adminAccount.borrow<&AFLPack.Pack>(from: AFLPack.PackStoragePath)
             ??panic("could not borrow admin reference")
         
-        let vaultRef = tokenRecipientAccount.borrow<&FlowToken.Vault>(from: /storage/flowTokenVault)
+        let vaultRef = tokenRecipientAccount.borrow<&FiatToken.Vault>(from: FiatToken.VaultStoragePath)
                 ??panic("could not borrow vault")
 
         self.temproryVault <- vaultRef.withdraw(amount: price)
