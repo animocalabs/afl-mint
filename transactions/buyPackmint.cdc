@@ -20,7 +20,7 @@ transaction () {
     }
     execute{
 
-        self.adminRef.buyPack(templateId:2, receiptAddress:0x179b6b1cb6755e31, price:49.0, flowPayment: <- self.temproryVault)
+        self.adminRef.buyPack(templateIds:[1,2,3], receiptAddress:0x179b6b1cb6755e31, price:49.0, flowPayment: <- self.temproryVault)
 
     }
 
