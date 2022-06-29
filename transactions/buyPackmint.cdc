@@ -3,7 +3,7 @@ import AFLNFT from 0xa33d4223b3818e3f
 import AFLPack from 0xa33d4223b3818e3f
 import FiatToken from 0xa983fecbed621163
 
-transaction (templateId:UInt64, receiptAddress:Address, price: UFix64) {
+transaction () {
     let adminRef: &AFLPack.Pack
     let temproryVault : @FungibleToken.Vault
 
@@ -15,12 +15,12 @@ transaction (templateId:UInt64, receiptAddress:Address, price: UFix64) {
         let vaultRef = tokenRecipientAccount.borrow<&FiatToken.Vault>(from: FiatToken.VaultStoragePath)
                 ??panic("could not borrow vault")
 
-        self.temproryVault <- vaultRef.withdraw(amount: price)
+        self.temproryVault <- vaultRef.withdraw(amount: 49.0)
 
     }
     execute{
 
-        self.adminRef.buyPack(templateId: templateId, receiptAddress: receiptAddress, price: price, flowPayment: <- self.temproryVault)
+        self.adminRef.buyPack(templateIds:[1,2,3], receiptAddress:0x458eb22930f6f07c, price:49.0, flowPayment: <- self.temproryVault)
 
     }
 
