@@ -3,7 +3,7 @@ import FlowToken from 0x7e60df042a9c0868
 import AFLNFT from 0x4ea480b0fc738e55
 import AFLPack from 0x4ea480b0fc738e55
 
-transaction (templateId:UInt64, receiptAddress:Address, price: UFix64) {
+transaction () {
     let adminRef: &AFLPack.Pack
     let temproryVault : @FungibleToken.Vault
 
@@ -15,12 +15,12 @@ transaction (templateId:UInt64, receiptAddress:Address, price: UFix64) {
         let vaultRef = tokenRecipientAccount.borrow<&FlowToken.Vault>(from: /storage/flowTokenVault)
                 ??panic("could not borrow vault")
 
-        self.temproryVault <- vaultRef.withdraw(amount: price)
+        self.temproryVault <- vaultRef.withdraw(amount: 49.0)
 
     }
     execute{
 
-        self.adminRef.buyPack(templateIds:[1,2,3], receiptAddress:0x179b6b1cb6755e31, price:49.0, flowPayment: <- self.temproryVault)
+        self.adminRef.buyPack(templateIds:[1,2,3], receiptAddress:0x458eb22930f6f07c, price:49.0, flowPayment: <- self.temproryVault)
 
     }
 

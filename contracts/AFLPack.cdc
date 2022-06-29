@@ -33,7 +33,7 @@ pub contract AFLPack {
         pub fun buyPack(templateIds: [UInt64], receiptAddress: Address, price: UFix64, flowPayment: @FungibleToken.Vault) {
             pre {
                 price > 0.0: "Price should be greater than zero"
-                templateIds.length > 0 : "template id  must not be zero"
+                templateIds.length > 0 : "template ids array length should be greater than zero"
                 flowPayment.balance == price: "Your vault does not have balance to buy NFT"
                 receiptAddress != nil : "receipt address must not be null"
             }
