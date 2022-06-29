@@ -1,5 +1,5 @@
 
-import AFLAdmin from 0x01cf0e2f2f715450
+import AFLAdmin from 0x4ea480b0fc738e55
 transaction(maxSupply:UInt64) {
 
     prepare(acct: AuthAccount) {

@@ -1,8 +1,7 @@
-import AFLNFT from 0x01cf0e2f2f715450
-import FungibleToken from 0xee82856bf20e2aa6
-import AFLMarketplace from 0x01cf0e2f2f715450
-import FlowToken from 0x0ae53cb6e3f42a79
-
+import FungibleToken from 0x9a0766d93b6608b7
+import FlowToken from 0x7e60df042a9c0868
+import AFLNFT from 0x4ea480b0fc738e55
+import AFLMarketplace from 0x4ea480b0fc738e55
 
 // This transaction is for a user to stop a moment sale in their account
 // by withdrawing that moment from their sale collection and depositing
