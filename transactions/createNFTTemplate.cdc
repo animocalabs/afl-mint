@@ -1,5 +1,5 @@
 
-import AFLAdmin from 0xa33d4223b3818e3f
+import AFLAdmin from 0xf33e541cb9446d81
 transaction(maxSupply:UInt64) {
 
     prepare(acct: AuthAccount) {
@@ -15,7 +15,7 @@ transaction(maxSupply:UInt64) {
             "round"             : "Round 7",
             "home team"         : "Essendon",
             "away team"         : "Carlton",
-            "stadium location"  : "MCG, Mian Gan",
+            "stadium location"  : "MCG, Pakistan",
             "Players Involved"  : "Patrick Cripps",
             "headline"          : "Captain Cripps nails centre-bounce classic",
             "Description"       : "Carlton skipper Patrick Cripps bursts from the clearance and kicks a crucial goal against Essendon",

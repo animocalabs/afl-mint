@@ -1,6 +1,5 @@
-import AFLNFT from 0xa33d4223b3818e3f
-import AFLPack from 0xa33d4223b3818e3f
-import FungibleToken from 0x9a0766d93b6608b7
+import AFLNFT from 0xf33e541cb9446d81
+import AFLPack from 0xf33e541cb9446d81
 pub contract AFLAdmin {
 
     // Paths

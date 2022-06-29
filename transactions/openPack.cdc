@@ -1,6 +1,6 @@
 
-import AFLNFT from 0xa33d4223b3818e3f
-import AFLPack from 0xa33d4223b3818e3f
+import AFLNFT from 0xf33e541cb9446d81
+import AFLPack from 0xf33e541cb9446d81
 transaction(accountAddress:Address, nftId:UInt64, receiptAddress:Address){
     prepare(acct: AuthAccount) {
         let account = getAccount(accountAddress)
