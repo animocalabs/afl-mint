@@ -7,12 +7,12 @@ transaction () {
     let adminRef: &AFLPack.Pack
     let temproryVault : @FungibleToken.Vault
 
-    prepare(adminAccount: AuthAccount){
+    prepare(adminAccount: AuthAccount, tokenRecipientAccount: AuthAccount){
         
         self.adminRef = adminAccount.borrow<&AFLPack.Pack>(from: AFLPack.PackStoragePath)
             ??panic("could not borrow admin reference")
         
-        let vaultRef = adminAccount.borrow<&FiatToken.Vault>(from: FiatToken.VaultStoragePath)
+        let vaultRef = tokenRecipientAccount.borrow<&FiatToken.Vault>(from: FiatToken.VaultStoragePath)
                 ??panic("could not borrow vault")
 
         self.temproryVault <- vaultRef.withdraw(amount: 1.0)
