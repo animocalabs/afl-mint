@@ -1,6 +1,6 @@
 import FungibleToken from 0x9a0766d93b6608b7
 import FlowToken from 0x7e60df042a9c0868
-import AFLAdmin from 0xa33d4223b3818e3f
+import AFLAdmin from 0xf33e541cb9446d81
 
 transaction(templateId: UInt64, account:Address){
 

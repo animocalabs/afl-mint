@@ -30,12 +30,13 @@ pub contract AFLPack {
             AFLPack.ownerAddress = owner
         }
         
-        pub fun buyPack(templateIds: [UInt64], receiptAddress: Address, price: UFix64, flowPayment: @FungibleToken.Vault) {
+        pub fun buyPack(templateIds: [UInt64], packTemplateId: UInt64, receiptAddress: Address, price: UFix64, flowPayment: @FungibleToken.Vault) {
             pre {
                 price > 0.0: "Price should be greater than zero"
                 templateIds.length > 0 : "template ids array length should be greater than zero"
                 flowPayment.balance == price: "Your vault does not have balance to buy NFT"
                 receiptAddress != nil : "receipt address must not be null"
+                packTemplateId != 0 : "pack template id must not be zero"
             }
             var allNftTemplateExists = true;
             assert(templateIds.length <= 10, message: "templates limit exceeded")
@@ -50,12 +51,15 @@ pub contract AFLPack {
                 nftTemplateIds.append(tempID)
             }
             
-            let immutableData : {String:AnyStruct} = {
-                "nftTemplates": nftTemplateIds
-            }
+            let packData = AFLNFT.getTemplateById(templateId: packTemplateId)
+            let packImmutableData = packData.getImmutableData()
+            packImmutableData["nftTemplates"] = nftTemplateIds
+            
+
+
 
             assert(allNftTemplateExists, message: "Invalid NFTs")
-            AFLNFT.createTemplate(maxSupply: 1, immutableData: immutableData)
+            AFLNFT.createTemplate(maxSupply: 1, immutableData: packImmutableData)
 
             let lastIssuedTemplateId = AFLNFT.getLatestTemplateId()
             let receiptAccount = getAccount(AFLPack.ownerAddress)
