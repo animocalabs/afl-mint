@@ -1,13 +1,13 @@
-import AFLNFT from 0x01cf0e2f2f715450
-import AFLPack from 0x01cf0e2f2f715450
-import FungibleToken from 0xee82856bf20e2aa6
+import AFLNFT from 0xf33e541cb9446d81
+import AFLPack from 0xf33e541cb9446d81
 pub contract AFLAdmin {
 
+    // Paths
+    pub let AdminStoragePath: StoragePath
     // Admin
     // the admin resource is defined so that only the admin account
     // can have this resource. It possesses the ability to open packs
-    // given a user's Pack Collection and Card Collection reference.
-    // It can also create a new pack type and mint Packs.
+    // given a user's Pack Collection reference.
     //
     pub resource Admin {
 
@@ -32,6 +32,7 @@ pub contract AFLAdmin {
     }
 
     init() {
-        self.account.save(<- create Admin(), to: /storage/AFLAdmin)
+        self.AdminStoragePath = /storage/AFLAdmin
+        self.account.save(<- create Admin(), to:  self.AdminStoragePath)
     }
 }
