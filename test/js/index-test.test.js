@@ -46,6 +46,7 @@ describe("Replicate Playground Accounts", () => {
     console.log("Bob:", Bob);
     console.log("Charlie:", Charlie);
     console.log("Dave:", Dave);
+    console.log("Charlie balance", await getFlowBalance(Charlie));
   });
 });
 describe("Deployment", () => {
@@ -64,9 +65,11 @@ describe("Deployment", () => {
     } catch (e) {
       console.log(e);
     }
+    console.log(result);
     expect(name).toBe("NonFungibleToken");
 
   });
+
   test("Deploy for AFLNFT", async () => {
     const name = "AFLNFT"
     const to = await getAccountAddress("Alice")
@@ -82,6 +85,7 @@ describe("Deployment", () => {
     } catch (e) {
       console.log(e);
     }
+    console.log(result);
     expect(name).toBe("AFLNFT");
 
   });
@@ -91,8 +95,10 @@ describe("Deployment", () => {
     let update = true
 
     const NonFungibleToken = await getContractAddress("NonFungibleToken");
+    const AFLNFT = await getContractAddress("AFLNFT");
     const addressMap = {
-      NonFungibleToken
+      NonFungibleToken,
+      AFLNFT,
     };
 
     let result;
@@ -106,6 +112,7 @@ describe("Deployment", () => {
     } catch (e) {
       console.log(e);
     }
+    console.log(result);
     expect(name).toBe("AFLPack");
 
   });
@@ -134,44 +141,13 @@ describe("Deployment", () => {
     catch (e) {
       console.log(e)
     }
+    console.log(result);
     expect(name).toBe("AFLAdmin");
-  });
-  test("Deploy for AFLMarketplace", async () => {
-    const name = "AFLMarketplace";
-    const to = await getAccountAddress("Alice");
-    let update = true;
-    const NonFungibleToken = await getContractAddress("NonFungibleToken");
-    const AFLNFT = await getContractAddress("AFLNFT")
-    const AFLPack = await getContractAddress("AFLPack")
-    const FungibleToken = "0xee82856bf20e2aa6"
-    const FlowToken = "0x0ae53cb6e3f42a79"
-    const addressMap = {
-      NonFungibleToken,
-      AFLNFT,
-      AFLPack,
-      FungibleToken,
-      FlowToken
-    };
-    let result;
-    try {
-      result = await deployContractByName({
-        name,
-        to,
-        addressMap,
-        update,
-      });
-    }
-    catch (e) {
-      console.log(e)
-    }
-
-    expect(name).toBe("AFLMarketplace");
   });
 
 });
 
 describe("Transactions", () => {
-
   test("test transaction create nft template", async () => {
     const name = "createNFTTemplate";
 
@@ -183,34 +159,34 @@ describe("Transactions", () => {
 
     // Generate addressMap from import statements
     const NonFungibleToken = await getContractAddress("NonFungibleToken");
-    const AFLNFT = await getContractAddress("AFLNFT");
-    const AFLPack = await getContractAddress("AFLPack")
+    const AFLAdmin = await getContractAddress("AFLAdmin")
     const addressMap = {
       NonFungibleToken,
-      AFLNFT,
-      AFLPack,
+      AFLAdmin,
     };
 
     let code = await getTransactionCode({
       name,
       addressMap,
     });
+
     //  brandId, schemaId, maxSupply
     const args = [1];
 
-    let txResult;
-    try {
-      txResult = await sendTransaction({
-        code,
-        signers,
-        args,
-      });
-    } catch (e) {
-      console.log(e);
+    for (var i = 0; i < 4; i++) {
+      let txResult;
+      try {
+        txResult = await sendTransaction({
+          code,
+          signers,
+          args,
+        });
+      } catch (e) {
+        console.log(e);
+      }
+      console.log("tx Result", txResult);
+      expect(txResult[0].status).toBe(4);
     }
-    console.log("tx Result", txResult);
-
-    expect(txResult[0].status).toBe(4);
   });
   test("test transaction create pack template", async () => {
     const name = "createPackTemplate";
@@ -237,47 +213,6 @@ describe("Transactions", () => {
     });
     // brandId, SchemaId, max supply
     const args = [1];
-
-    let txResult;
-    try {
-      txResult = await sendTransaction({
-        code,
-        signers,
-        args,
-      });
-    } catch (e) {
-      console.log(e);
-    }
-    console.log("tx Result", txResult);
-
-    expect(txResult[0].errorMessage).toBe("");
-  });
-  test("test transaction create Pack", async () => {
-    const name = "createPack";
-
-    // Import participating accounts
-    const Alice = await getAccountAddress("Alice");
-
-    // Set transaction signers
-    const signers = [Alice];
-
-    // Generate addressMap from import statements
-    const NonFungibleToken = await getContractAddress("NonFungibleToken");
-    const AFLNFT = await getContractAddress("AFLNFT");
-    const AFLPack = await getContractAddress("AFLPack")
-    const addressMap = {
-      NonFungibleToken,
-      AFLNFT,
-      AFLPack,
-    };
-
-    let code = await getTransactionCode({
-      name,
-      addressMap,
-    });
-
-
-    const args = [2];
 
     let txResult;
     try {
@@ -415,7 +350,6 @@ describe("Transactions", () => {
 
     expect(txResult[0].errorMessage).toBe("");
   });
-
   test("test transaction buy Pack", async () => {
     const name = "buyPackmint";
 
@@ -452,14 +386,14 @@ describe("Transactions", () => {
       return `getAccount(${name})`;
     });
 
-    // const args = [Alice];
+    const args = [49.0, [1, 2], 5, Bob];
 
     let txResult;
     try {
       txResult = await sendTransaction({
         code,
         signers,
-        // args,
+        args,
       });
     } catch (e) {
       console.log(e);
@@ -500,7 +434,7 @@ describe("Transactions", () => {
       return `getAccount(${name})`;
     });
 
-    const args = [Alice];
+    const args = [Alice, 1, Bob];
 
     let txResult;
     try {
@@ -516,206 +450,6 @@ describe("Transactions", () => {
 
     expect(txResult[0].errorMessage).toBe("");
   });
-
-  // test("test transaction change percentage", async () => {
-  //   const name = "changePercentage";
-
-  //   // Import participating accounts
-  //   const Alice = await getAccountAddress("Alice");
-  //   // Set transaction signers
-  //   const signers = [Alice];
-
-  //   // Generate addressMap from import statements
-  //   const AFLMarketplace = await getAccountAddress("AFLMarketplace")
-  //   const FungibleToken = "0xee82856bf20e2aa6"
-  //   const FlowToken = "0x0ae53cb6e3f42a79"
-
-  //   const addressMap = {
-  //     AFLMarketplace,
-  //     FungibleToken,
-  //     FlowToken
-  //   };
-  //   let code = await getTransactionCode({
-  //     name,
-  //     addressMap,
-  //   });
-
-  //   code = code.toString().replace(/(?:getAccount\(\s*)(0x.*)(?:\s*\))/g, (_, match) => {
-  //     const accounts = {
-  //       "0x01": Alice,
-  //     };
-  //     const name = accounts[match];
-  //     return `getAccount(${name})`;
-  //   });
-
-  //   const args = [0.30];
-
-  //   let txResult;
-  //   try {
-  //     txResult = await sendTransaction({
-  //       code,
-  //       signers,
-  //       args,
-  //     });
-  //   } catch (e) {
-  //     console.log(e);
-  //   }
-  //   console.log("tx Result", txResult);
-
-  //   expect(txResult[0].errorMessage).toBe("");
-  // });
-  test("test transaction create start sale", async () => {
-    const name = "createStartSale";
-
-    // Import participating accounts
-    const Bob = await getAccountAddress("Bob");
-    const Alice = await getAccountAddress("Alice");
-    // Set transaction signers
-    const signers = [Bob];
-
-    // Generate addressMap from import statements
-    const AFLNFT = await getContractAddress("AFLNFT");
-    const AFLMarketplace = await getAccountAddress("AFLMarketplace")
-    const FungibleToken = "0xee82856bf20e2aa6"
-    const FlowToken = "0x0ae53cb6e3f42a79"
-    const addressMap = {
-      AFLNFT,
-      AFLMarketplace,
-      FungibleToken,
-      FlowToken,
-    };
-    let code = await getTransactionCode({
-      name,
-      addressMap,
-    });
-
-    code = code.toString().replace(/(?:getAccount\(\s*)(0x.*)(?:\s*\))/g, (_, match) => {
-      const accounts = {
-        "0x01": Alice,
-        "0x02": Bob
-      };
-      const name = accounts[match];
-      return `getAccount(${name})`;
-    });
-
-    const args = [2, 49.0];
-
-    let txResult;
-    try {
-      txResult = await sendTransaction({
-        code,
-        signers,
-        args,
-      });
-    } catch (e) {
-      console.log(e);
-    }
-    console.log("tx Result", txResult);
-
-    expect(txResult[0].errorMessage).toBe("");
-  });
-  // test("test transaction create stop sale", async () => {
-  //   const name = "stopSale";
-
-  //   // Import participating accounts
-  //   const Bob = await getAccountAddress("Bob");
-  //   const Alice = await getAccountAddress("Alice");
-  //   // Set transaction signers
-  //   const signers = [Bob];
-
-  //   // Generate addressMap from import statements
-  //   const AFLNFT = await getContractAddress("AFLNFT");
-  //   const AFLMarketplace = await getAccountAddress("AFLMarketplace")
-  //   const FungibleToken = "0xee82856bf20e2aa6"
-  //   const FlowToken = "0x0ae53cb6e3f42a79"
-  //   const addressMap = {
-  //     AFLNFT,
-  //     AFLMarketplace,
-  //     FungibleToken,
-  //     FlowToken,
-  //   };
-  //   let code = await getTransactionCode({
-  //     name,
-  //     addressMap,
-  //   });
-
-  //   code = code.toString().replace(/(?:getAccount\(\s*)(0x.*)(?:\s*\))/g, (_, match) => {
-  //     const accounts = {
-  //       "0x01": Alice,
-  //       "0x02": Bob
-  //     };
-  //     const name = accounts[match];
-  //     return `getAccount(${name})`;
-  //   });
-
-  //   const args = [2];
-
-  //   let txResult;
-  //   try {
-  //     txResult = await sendTransaction({
-  //       code,
-  //       signers,
-  //       args,
-  //     });
-  //   } catch (e) {
-  //     console.log(e);
-  //   }
-  //   console.log("tx Result", txResult);
-
-  //   expect(txResult[0].errorMessage).toBe("");
-  // });
-  test("test transaction purchase moment", async () => {
-    const name = "purchaseMoment";
-
-    // Import participating accounts
-    const Bob = await getAccountAddress("Bob");
-    const Alice = await getAccountAddress("Alice");
-    const Charlie = await getAccountAddress("Charlie")
-    // Set transaction signers
-    const signers = [Charlie];
-
-    // Generate addressMap from import statements
-    const AFLNFT = await getContractAddress("AFLNFT");
-    const AFLMarketplace = await getContractAddress("AFLMarketplace")
-    const FungibleToken = "0xee82856bf20e2aa6"
-    const FlowToken = "0x0ae53cb6e3f42a79"
-    const addressMap = {
-      AFLNFT,
-      AFLMarketplace,
-      FungibleToken,
-      FlowToken,
-    };
-    let code = await getTransactionCode({
-      name,
-      addressMap,
-    });
-
-    code = code.toString().replace(/(?:getAccount\(\s*)(0x.*)(?:\s*\))/g, (_, match) => {
-      const accounts = {
-        "0x01": Alice,
-        "0x02": Bob
-      };
-      const name = accounts[match];
-      return `getAccount(${name})`;
-    });
-
-    const args = [Bob, 2, 49.0];
-
-    let txResult;
-    try {
-      txResult = await sendTransaction({
-        code,
-        signers,
-        args,
-      });
-    } catch (e) {
-      console.log(e);
-    }
-    console.log("tx Result", txResult);
-
-    expect(txResult[0].errorMessage).toBe("");
-  });
-
 })
 describe("Scripts", () => {
   test("get AFLNFT Ids for Bob", async () => {
@@ -828,37 +562,6 @@ describe("Scripts", () => {
       const name = accounts[match];
       return `getAccount(${name})`;
     });
-    const args = [Charlie]
-
-    const result = await executeScript({
-      code,
-      args,
-    });
-    console.log("result", result);
-  });
-  test("get percentage", async () => {
-
-    const name = "getPercentage";
-
-    const AFLMarketplace = await getContractAddress("AFLMarketplace")
-    const Alice = await getAccountAddress("Alice")
-    const Bob = await getAccountAddress("Bob")
-
-    const addressMap = {
-      AFLMarketplace,
-    }
-    let code = await getScriptCode({
-      name,
-      addressMap,
-    })
-
-    code = code.toString().replace(/(?:getAccount\(\s*)(0x.*)(?:\s*\))/g, (_, match) => {
-      const accounts = {
-        "0x01": Alice,
-      };
-      const name = accounts[match];
-      return `getAccount(${name})`;
-    });
     const args = [Bob]
 
     const result = await executeScript({
@@ -867,5 +570,4 @@ describe("Scripts", () => {
     });
     console.log("result", result);
   });
-
 })

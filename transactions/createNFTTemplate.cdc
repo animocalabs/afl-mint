@@ -20,7 +20,7 @@ transaction(maxSupply:UInt64) {
             "headline"          : "Captain Cripps nails centre-bounce classic",
             "Description"       : "Carlton skipper Patrick Cripps bursts from the clearance and kicks a crucial goal against Essendon",
             "collectionName"    : "Ripper Skipper",
-            "tier"              : "Common"
+            "tier"              : "Epic"
         }
         adminRef.createTemplate( maxSupply: maxSupply, immutableData: immutableData)
     }
