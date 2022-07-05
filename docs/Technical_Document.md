@@ -42,7 +42,8 @@ can be read from the AFLNFT, AFLPack and AFLAdmin contracts.
 | Network | Contract Address     |
 | ------- | -------------------- |
 | Mainnet | `` |
-| Testnet | `0x4ea480b0fc738e55` |
+| Testnet | `0xf33e541cb9446d81` |
+
 
 ## AFLPack Addresses
 
@@ -51,7 +52,7 @@ can be read from the AFLNFT, AFLPack and AFLAdmin contracts.
 | Network | Contract Address     |
 | ------- | -------------------- |
 | Mainnet | `` |
-| Testnet | `0x4ea480b0fc738e55` |
+| Testnet | `0xf33e541cb9446d81` |
 
 ### Deployment Contract on Emulator
 

@@ -1,7 +1,9 @@
 import FungibleToken from 0x9a0766d93b6608b7
 import NonFungibleToken from 0x631e88ae7f1d7c20
 import AFLNFT from 0xf33e541cb9446d81
-import FlowToken from 0x7e60df042a9c0868
+
+import FiatToken from 0xa983fecbed621163
+
 pub contract AFLPack {
     // event when a pack is bought
     pub event PackBought(templateId: UInt64, receiptAddress: Address?)
@@ -13,8 +15,8 @@ pub contract AFLPack {
     pub let PackPublicPath : PublicPath
 
     access(self) var ownerAddress: Address
-
-    access(contract) let adminRef : Capability<&FlowToken.Vault{FungibleToken.Receiver}>
+    
+    access(contract) let adminRef : Capability<&FiatToken.Vault{FungibleToken.Receiver}>
 
     pub resource interface PackPublic {
         // making this function public to call by authorized users
@@ -53,17 +55,17 @@ pub contract AFLPack {
             let packData = AFLNFT.getTemplateById(templateId: packTemplateId)
             let packImmutableData = packData.getImmutableData()
             packImmutableData["nftTemplates"] = nftTemplateIds
-
             assert(allNftTemplateExists, message: "Invalid NFTs")
             AFLNFT.createTemplate(maxSupply: 1, immutableData: packImmutableData)
 
             let lastIssuedTemplateId = AFLNFT.getLatestTemplateId()
             let receiptAccount = getAccount(AFLPack.ownerAddress)
             let recipientCollection = receiptAccount
-                .getCapability(/public/flowTokenReceiver)
-                .borrow<&FlowToken.Vault{FungibleToken.Receiver}>()
+                .getCapability(FiatToken.VaultReceiverPubPath)
+                .borrow<&FiatToken.Vault{FungibleToken.Receiver}>()
                 ?? panic("Could not get receiver reference to the flow receiver")
             recipientCollection.deposit(from: <-flowPayment)
+            
             AFLNFT.mintNFT(templateId: lastIssuedTemplateId, account: receiptAddress)
             emit PackBought(templateId: lastIssuedTemplateId, receiptAddress: receiptAddress)
         } 
@@ -89,7 +91,7 @@ pub contract AFLPack {
     }
     init() {
         self.ownerAddress = self.account!.address
-        var adminRefCap =  self.account.getCapability<&FlowToken.Vault{FungibleToken.Receiver}>(/public/flowTokenReceiver)
+        var adminRefCap =  self.account.getCapability<&FiatToken.Vault{FungibleToken.Receiver}>(FiatToken.VaultReceiverPubPath)
         self.adminRef = adminRefCap
         self.PackStoragePath = /storage/AFLPack
         self.PackPublicPath = /public/AFLPack
