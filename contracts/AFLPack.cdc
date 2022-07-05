@@ -50,17 +50,12 @@ pub contract AFLPack {
                 }
                 nftTemplateIds.append(tempID)
             }
-            
             let packData = AFLNFT.getTemplateById(templateId: packTemplateId)
             let packImmutableData = packData.getImmutableData()
             packImmutableData["nftTemplates"] = nftTemplateIds
-            
-
-
-
             assert(allNftTemplateExists, message: "Invalid NFTs")
             AFLNFT.createTemplate(maxSupply: 1, immutableData: packImmutableData)
-
+            
             let lastIssuedTemplateId = AFLNFT.getLatestTemplateId()
             let receiptAccount = getAccount(AFLPack.ownerAddress)
             let recipientCollection = receiptAccount

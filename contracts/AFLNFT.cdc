@@ -178,7 +178,6 @@ pub contract AFLNFT : NonFungibleToken {
     }
 
     //method to get the latest template id
-
     pub fun getLatestTemplateId() : UInt64 {
         return AFLNFT.lastIssuedTemplateId - 1
     }
