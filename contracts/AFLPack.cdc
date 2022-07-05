@@ -1,6 +1,7 @@
 import FungibleToken from 0x9a0766d93b6608b7
 import NonFungibleToken from 0x631e88ae7f1d7c20
 import AFLNFT from 0xf33e541cb9446d81
+
 import FiatToken from 0xa983fecbed621163
 
 pub contract AFLPack {
@@ -14,7 +15,7 @@ pub contract AFLPack {
     pub let PackPublicPath : PublicPath
 
     access(self) var ownerAddress: Address
-
+    
     access(contract) let adminRef : Capability<&FiatToken.Vault{FungibleToken.Receiver}>
 
     pub resource interface PackPublic {
@@ -50,12 +51,13 @@ pub contract AFLPack {
                 }
                 nftTemplateIds.append(tempID)
             }
+            
             let packData = AFLNFT.getTemplateById(templateId: packTemplateId)
             let packImmutableData = packData.getImmutableData()
             packImmutableData["nftTemplates"] = nftTemplateIds
             assert(allNftTemplateExists, message: "Invalid NFTs")
             AFLNFT.createTemplate(maxSupply: 1, immutableData: packImmutableData)
-            
+
             let lastIssuedTemplateId = AFLNFT.getLatestTemplateId()
             let receiptAccount = getAccount(AFLPack.ownerAddress)
             let recipientCollection = receiptAccount
@@ -63,7 +65,7 @@ pub contract AFLPack {
                 .borrow<&FiatToken.Vault{FungibleToken.Receiver}>()
                 ?? panic("Could not get receiver reference to the flow receiver")
             recipientCollection.deposit(from: <-flowPayment)
-
+            
             AFLNFT.mintNFT(templateId: lastIssuedTemplateId, account: receiptAddress)
             emit PackBought(templateId: lastIssuedTemplateId, receiptAddress: receiptAddress)
         } 

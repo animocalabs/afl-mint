@@ -44,6 +44,7 @@ can be read from the AFLNFT, AFLPack and AFLAdmin contracts.
 | Mainnet | `` |
 | Testnet | `0xf33e541cb9446d81` |
 
+
 ## AFLPack Addresses
 
 `AFLPack.cdc`: This is the AFLPack smart contract that has the functionality of the packs.
